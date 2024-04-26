@@ -8,14 +8,15 @@ Run the following commands to build the image for your target architecture, and 
 ```bash
 docker build --target x86_64 --build-arg PLUGINS="plugin1 plugin2" -t cargoimage .
 ```
-
+Run the container to get access to the binaries.
 ```bash
 docker run --name cargocontainer cargoimage
 ```
-
+Copy the binaries to your host machine.
 ```bash
 docker cp cargocontainer:/workspace/binaries ~/.tmp/cargo
 ```
+Remove the container and image.
 ```bash
 docker rm cargocontainer && docker rmi cargoimage
 ```
