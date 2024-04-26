@@ -36,7 +36,7 @@ RUN if [ -z "$PLUGINS" ]; then \
 	exit 1; \
 	else \
 	for plugin in $PLUGINS; do \
-	cargo install $plugin --target aarch64-unknown-linux-gnu; \
+	cargo install $plugin; \
 	cp /root/.cargo/bin/$plugin /workspace/binaries/ || exit 1; \
 	done \
 	fi
