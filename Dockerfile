@@ -21,24 +21,25 @@ ENV PATH="/root/.cargo/bin:${PATH}"
 RUN rustup toolchain install stable
 RUN rustup default stable
 
-# Install mdbook and its plugins
-RUN cargo install mdbook-external-links --target aarch64-unknown-linux-gnu
-RUN cargo install mdbook-pandoc --target aarch64-unknown-linux-gnu
-RUN cargo install mdbook-toc --target aarch64-unknown-linux-gnu
-
-# Expose the binaries to the system
-RUN ln -s /root/.cargo/bin/mdbook-external-links /usr/local/bin/mdbook-external-links
-RUN ln -s /root/.cargo/bin/pandoc-preprocess /usr/local/bin/pandoc-preprocess
-RUN ln -s /root/.cargo/bin/mdbook-toc /usr/local/bin/mdbook-toc
-
-# Copy binaries to /workspace/binaries/
-RUN mkdir -p /workspace/binaries/
-RUN cp /root/.cargo/bin/mdbook-external-links /workspace/binaries/
-RUN cp /root/.cargo/bin/mdbook-pandoc /workspace/binaries/
-RUN cp /root/.cargo/bin/mdbook-toc /workspace/binaries/
-
 # Set the work directory
 WORKDIR /workspace
+
+# Argument to specify plugins (space-separated list)
+ARG PLUGINS
+
+# Create the binaries directory
+RUN mkdir -p /workspace/binaries/
+
+# Install specified plugins and copy their binaries
+RUN if [ -z "$PLUGINS" ]; then \
+	echo "Error: No plugins provided."; \
+	exit 1; \
+	else \
+	for plugin in $PLUGINS; do \
+	cargo install $plugin --target aarch64-unknown-linux-gnu; \
+	cp /root/.cargo/bin/$plugin /workspace/binaries/ || exit 1; \
+	done \
+	fi
 
 # Set the entry point
 CMD ["bash"]
